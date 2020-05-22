@@ -232,6 +232,22 @@ class TokenVerifier():
     """
 
     def verify(self, token, nonce=None, max_age=None):
+        self.verified_payload(token, nonce=nonce, max_age=max_age)
+
+    """Attempts to verify the given ID token, following the steps defined in the OpenID Connect spec.
+    If successful, returns the (verified) payload.
+
+    Args:
+        token (str): The JWT to verify.
+        nonce (str, optional): The nonce value sent during authentication.
+        max_age (int, optional): The max_age value sent during authentication.
+
+    Raises:
+        TokenValidationError: when the token cannot be decoded, the token signing algorithm is not the expected one, 
+        the token signature is invalid or the token has a claim missing or with unexpected value.
+    """
+
+    def verified_payload(self, token, nonce=None, max_age=None):
         # Verify token presence
         if not token or not isinstance(token, str):
             raise TokenValidationError("ID token is required but missing.")
@@ -241,6 +257,8 @@ class TokenVerifier():
 
         # Verify claims
         self._verify_payload(payload, nonce, max_age)
+
+        return payload
 
     def _verify_payload(self, payload, nonce=None, max_age=None):
         try:
